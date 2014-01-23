@@ -201,49 +201,49 @@ try:
   bHeader = False
   for value in options.sKeyValues:
     options.verbosity > 1 and log("searching for value: '" + value + "'")
-  lRow = 0
+    lRow = 0
     bReadRow = True
-  while bReadRow:
+    while bReadRow:
       if lRow == 0 and not bHeader:
 
-      if options.sKeyName != "":
-        # find key, and setup dictionary for output fields
-        for lCol in range(len(data[0])):
-          if data[lRow][lCol] == options.sKeyName:
-            lKey = lCol
-            break
-        if lKey == -1:
-          raise Exception("key name: '" + options.sKeyName + "' not found in header")
-      if options.sFields[0] == "*":
-        lFields = range(len(data[0]))
-        for lCol in lFields:
-          aFields.append(data[lRow][lCol])
-      else:
-        aFields = options.sFields
-        bSet = False
-        for sField in aFields:
+        if options.sKeyName != "":
+          # find key, and setup dictionary for output fields
           for lCol in range(len(data[0])):
-            if data[lRow][lCol] == sField:
-              lFields.append(lCol)
-              bSet = True
-        if not bSet:
-          lFields.append(-1)
-      # add headers to results array
-      results.append(aFields)
-    else:
-      # test key against key value
+            if data[lRow][lCol] == options.sKeyName:
+              lKey = lCol
+              break
+          if lKey == -1:
+            raise Exception("key name: '" + options.sKeyName + "' not found in header")
+        if options.sFields[0] == "*":
+          lFields = range(len(data[0]))
+          for lCol in lFields:
+            aFields.append(data[lRow][lCol])
+        else:
+          aFields = options.sFields
+          bSet = False
+          for sField in aFields:
+            for lCol in range(len(data[0])):
+              if data[lRow][lCol] == sField:
+                lFields.append(lCol)
+                bSet = True
+          if not bSet:
+            lFields.append(-1)
+        # add headers to results array
+        results.append(aFields)
+      else:
+        # test key against key value
         if data[lRow][lKey] == value or value == "*":
-        # success
-        cols = []
-        for l in lFields:
-          cols.append(data[lRow][l])
-        results.append(cols)
+          # success
+          cols = []
+          for l in lFields:
+            cols.append(data[lRow][l])
+          results.append(cols)
           if not options.bDuplicates and value != "*":
             bReadRow = False
 
-    lRow += 1
-    if lRow > len(data) - 1:
-      bReadRow = False
+      lRow += 1
+      if lRow > len(data) - 1:
+        bReadRow = False
 
   if len(results) > 1:
     # print results
