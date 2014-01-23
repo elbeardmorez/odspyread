@@ -15,27 +15,32 @@ Usage: odspyread.py [options]
 Options:
   -h, --help            show this help message and exit
   -d DOC, --document=DOC
-                        set DOC to the spreadsheet path
+                        the spreadsheet path
   -e SHEET, --sheet=SHEET
-                        set SHEET to the sheet name of interest
-  -i IDX, --idx=IDX     set IDX as the name of the index/key field for
-                        searching in
+                        [optional] sheet name of interest [default: first
+                        sheet]
+  -i IDX, --idx=IDX     [optional] name of the index/key field for searching
+                        in
   -s SEARCH, --search=SEARCH
-                        set SEARCH as the value to search for in the index/key
-                        field
+                        [optional] comma-delimited list of value(s) to search
+                        for in the index/key field [default: *]
+  -m, --allow-duplicates
+                        [optional] continue searching for duplicates after
+                        match [default: false]
   -f FIELDS, --fields=FIELDS
-                        FIELDS is a comma delimited list of fields to extract
-                        data from
+                        [optional] comma delimited list of field(s) to extract
+                        data from [default: *]
   -r HEADERROWSTART, --header-row=HEADERROWSTART
-                        set HEADERROWSTART if multiple tables exist in the
-                        sheet
+                        [optional] row number for specifying table location
+                        where multiple tables exist in a sheet [default: 1]
   -c HEADERCOLUMNSTART, --header-column=HEADERCOLUMNSTART
-                        set HEADERCOLUMNSTART if multiple tables exist in the
-                        sheet
+                        [optional] column number for specifying table location
+                        where multiple tables exist in a sheet [default: 1]
   -l DELIMITER, --delimiter=DELIMITER
-                        set DELIMITER to change the data output delimiter
+                        [optional] change the data output delimiter [default:
+                        ' | ']
   -v VERBOSITY, --verbosity=VERBOSITY
-                        log level
+                        log level [default: 1]
 
 ## examples
 
@@ -62,7 +67,6 @@ header 1 idx,header 3
 search 2,data2 2 3
 
 ## todo
--multiple search terms
 -regexp search switch
 -ignore prefix/filter
 -handle non-existent fields

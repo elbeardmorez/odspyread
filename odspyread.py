@@ -9,7 +9,6 @@ from optparse import OptionParser # deprecated
 import odf.opendocument
 from odf.table import *
 from odf.text import P
-from odf.style import Style, TextProperties, ParagraphProperties, TableColumnProperties
 
 #globals
 
@@ -117,33 +116,38 @@ def optionsPathExpansionCallback(option, opt, value, parser):
   setattr(optionParser.values, option.dest, os.path.expandvars(os.path.expanduser(value)).split(','))
 optionParser.add_option("-d", "--document", metavar = "DOC", default = "",
                         type = "string", dest = "sDoc",
-                        help = "set DOC to the spreadsheet path")
+                        help = "the spreadsheet path")
 optionParser.add_option("-e", "--sheet", metavar = "SHEET", default = "", 
                         type = "string", dest = "sSheet",
-                        help = "set SHEET to the sheet name of interest")
+                        help = "[optional] sheet name of interest [default: first sheet]")
 optionParser.add_option("-i", "--idx", metavar = "IDX", default = "",
                         type = "string", dest = "sKeyName",
-                        help = "set IDX as the name of the index/key field for searching in")
+                        help = "[optional] name of the index/key field for searching in")
 optionParser.add_option("-s", "--search", metavar = "SEARCH", default = ("*"),
-                        type = "string", dest = "sKeyValue",
-                        help = "set SEARCH as the value to search for in the index/key field")
+                        type = "string", dest = "sKeyValues",
+                        action = "callback", callback = optionsListCallback,
+                        help = "[optional] comma-delimited list of value(s) to search for in the index/key field [default: *]")
+optionParser.add_option("-m", "--allow-duplicates", metavar = "DUPLICATES",
+                        dest = "bDuplicates", default = False,
+                        action = "store_true",
+                        help = "[optional] continue searching for duplicates after match [default: false]")
 optionParser.add_option('-f', '--fields', metavar = "FIELDS", default = ("*"),
                         type = "string", dest = "sFields",
                         action = "callback", callback = optionsListCallback,
-                        help = "FIELDS is a comma delimited list of fields to extract data from")
+                        help = "[optional] comma delimited list of field(s) to extract data from [default: *]")
 optionParser.add_option("-r", "--header-row", metavar = "HEADERROWSTART",
                         type = "int", dest = "lRowStart", default = 1,
-                        help = "set HEADERROWSTART if multiple tables exist in the sheet")
+                        help = "[optional] row number for specifying table location where multiple tables exist in a sheet [default: 1]")
 optionParser.add_option("-c", "--header-column", metavar = "HEADERCOLUMNSTART",
                         type = "int", dest = "lColumnStart", default = 1,
-                        help = "set HEADERCOLUMNSTART if multiple tables exist in the sheet")
+                        help = "[optional] column number for specifying table location where multiple tables exist in a sheet [default: 1]")
 optionParser.add_option("-l", "--delimiter", metavar = "DELIMITER",
                         type = "string", dest = "sDelimiter", default = u' | ',
-                        help = "set DELIMITER to change the data output delimiter")
+                        help = "[optional] change the data output delimiter [default: ' | ']")
 optionParser.add_option("-v", "--verbosity", metavar = "VERBOSITY",
                         type = "int", dest = "verbosity", default = 1,
                         action = "store",
-                        help = "log level")
+                        help = "log level [default: 1]")
 
 (options, args) = optionParser.parse_args() # options is a 'dict', args a 'list'
 
@@ -194,10 +198,14 @@ try:
   lKey = -1
   lFields = []
   aFields = []
-  bReadRow = True
+  bHeader = False
+  for value in options.sKeyValues:
+    options.verbosity > 1 and log("searching for value: '" + value + "'")
   lRow = 0
+    bReadRow = True
   while bReadRow:
-    if lRow == 0:
+      if lRow == 0 and not bHeader:
+
       if options.sKeyName != "":
         # find key, and setup dictionary for output fields
         for lCol in range(len(data[0])):
@@ -224,15 +232,14 @@ try:
       results.append(aFields)
     else:
       # test key against key value
-      if (data[lRow][lKey] == options.sKeyValue or 
-         options.sKeyValue == "*"):
+        if data[lRow][lKey] == value or value == "*":
         # success
         cols = []
         for l in lFields:
           cols.append(data[lRow][l])
         results.append(cols)
-#        if options.sKeyValue != "*":
-#          bReadRow = False
+          if not options.bDuplicates and value != "*":
+            bReadRow = False
 
     lRow += 1
     if lRow > len(data) - 1:
