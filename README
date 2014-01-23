@@ -1,0 +1,69 @@
+
+# odspyread
+
+## description
+
+python script to extract data from an ods format spreadsheet. handles multiple tables per sheet. optionally search for a value in a specified index/field and dump a selection/all fields' data for the records found
+
+## dependencies
+-odfpy
+
+## help
+
+Usage: odspyread.py [options]
+
+Options:
+  -h, --help            show this help message and exit
+  -d DOC, --document=DOC
+                        set DOC to the spreadsheet path
+  -e SHEET, --sheet=SHEET
+                        set SHEET to the sheet name of interest
+  -i IDX, --idx=IDX     set IDX as the name of the index/key field for
+                        searching in
+  -s SEARCH, --search=SEARCH
+                        set SEARCH as the value to search for in the index/key
+                        field
+  -f FIELDS, --fields=FIELDS
+                        FIELDS is a comma delimited list of fields to extract
+                        data from
+  -r HEADERROWSTART, --header-row=HEADERROWSTART
+                        set HEADERROWSTART if multiple tables exist in the
+                        sheet
+  -c HEADERCOLUMNSTART, --header-column=HEADERCOLUMNSTART
+                        set HEADERCOLUMNSTART if multiple tables exist in the
+                        sheet
+  -l DELIMITER, --delimiter=DELIMITER
+                        set DELIMITER to change the data output delimiter
+  -v VERBOSITY, --verbosity=VERBOSITY
+                        log level
+
+## examples
+
+the following examples are based on the content of 'test.odf':
+
+*search for 'search 2' record under field 'header 3 idx'
+> ./odspyread.py -d test.ods -i "header 3 idx" -s "search 2"
+
+header 1 | header 2 | header 3 idx | header 4 | header 5
+ | data1 2 2 | search 2 |  |
+
+*dump a table which exists at some offset in the sheet
+>./odspyread.py -d test.ods -r 10 -c 5
+
+header 1 | header 2 idx | header 2 | header 4
+ | search 1 |  |
+ | search 2 | data3 2 2 |
+ | search 3 |  | data3 3 4
+
+*search for 'search2' in sheet 'test' in the first table found beyond row 9, returning data for fields 'header1 idx' and 'header 3' only, delimited by ','
+>./odspyread.py -d test.ods -r 9 -i 'header 1 idx' -s 'search 2' -f 'header 1 idx,header 3' -l ','
+
+header 1 idx,header 3
+search 2,data2 2 3
+
+## todo
+-multiple search terms
+-regexp search switch
+-ignore prefix/filter
+-handle non-existent fields
+
