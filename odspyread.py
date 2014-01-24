@@ -24,21 +24,22 @@ def cell2text(cell):
       text = text + unicode(tn2.data)
   return text
 
-def table2Array(table):
+def table2array(table):
   data = []
   rows = table.getElementsByType(TableRow)
   for row in rows:
+    lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
     cells = row.getElementsByType(TableCell)
     values = []
     for cell in cells:
-      lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
+      lRepeated2 = int(cell.getAttribute("numbercolumnsrepeated") or 1)
       text = cell2text(cell)
       values.append(text)
-      if lRepeated > 1: 
-        for _ in range(lRepeated - 1):
+      if lRepeated2 > 1:
+        for _ in range(lRepeated2 - 1):
           values.append(text)
-
-    data.append(values)
+    for _ in range(lRepeated):
+      data.append(values)
   return data
 
 def getTable(sheet, lRowStart, lColumnStart):
@@ -51,7 +52,7 @@ def getTable(sheet, lRowStart, lColumnStart):
   lRowEmptyCount = 0
   for row in rows:
     lColumn = 1
-    if lRowEmptyCount > 1:
+    if lRowEmptyCount >= options.lSeparationRowCount:
       # end of table
       break
     if lRow >= lRowStart:
@@ -60,6 +61,8 @@ def getTable(sheet, lRowStart, lColumnStart):
         # empty row (cell repeated)
         lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
         lRow += lRepeated
+        if bHeader:
+          lRowEmptyCount += lRepeated
         continue
       tr = TableRow()
       if not bHeader:
@@ -108,7 +111,11 @@ def getTable(sheet, lRowStart, lColumnStart):
           lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
           lRowEmptyCount += lRepeated
         else:
-          lRowEmptyCount = 0
+          if lRowEmptyCount > 0:
+            tr2 = TableRow(numberrowsrepeated = lRowEmptyCount)
+            tr2.addElement(TableCell(numbercolumnsrepeated = lFields))
+            table.addElement(tr2)
+            lRowEmptyCount = 0
           table.addElement(tr)
 
     lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
@@ -151,6 +158,9 @@ optionParser.add_option("-c", "--header-column", metavar = "HEADERCOLUMNSTART",
 optionParser.add_option("-l", "--delimiter", metavar = "DELIMITER",
                         type = "string", dest = "sDelimiter", default = u' | ',
                         help = "[optional] change the data output delimiter [default: ' | ']")
+optionParser.add_option("-x", "--separation-row-count", metavar = "SEPARATIONROWCOUNT",
+                        type = "int", dest = "lSeparationRowCount", default = 1,
+                        help = "[optional] set the minimum number of concurrent empty rows for determining table extents [default: 1]")
 optionParser.add_option("-v", "--verbosity", metavar = "VERBOSITY",
                         type = "int", dest = "verbosity", default = 1,
                         action = "store",
@@ -197,7 +207,7 @@ try:
   # get table
   table = getTable(sheet, options.lRowStart, options.lColumnStart)
   # flatten table
-  data = table2Array(table)
+  data = table2array(table)
 
   results = []
 

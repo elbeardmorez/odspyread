@@ -39,6 +39,9 @@ Options:
   -l DELIMITER, --delimiter=DELIMITER
                         [optional] change the data output delimiter [default:
                         ' | ']
+  -x SEPARATIONROWCOUNT, --separation-row-count=SEPARATIONROWCOUNT
+                        [optional] set the minimum number of concurrent empty
+                        rows for determining table extents [default: 1]
   -v VERBOSITY, --verbosity=VERBOSITY
                         log level [default: 1]
 
