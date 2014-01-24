@@ -91,13 +91,14 @@ def getTable(sheet, lRowStart, lColumnStart):
         lRowEmptyCount = 0
         for cell in cells:
           lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
-          if lColumn >= lColumnFirst or lColumn + lRepeated - 1 >= lColumnFirst:
+          if ((lColumn >= lColumnFirst or lColumn + lRepeated - 1 >= lColumnFirst) and
+             lColumn <= lColumnFirst + lFields - 1):
             # trim overlap
-            if lColumn < lColumnFirst and lColumn + lRepeated -1 >= lColumnFirst:
+            if lColumn < lColumnFirst and lColumn + lRepeated - 1 >= lColumnFirst:
               lRepeated = lColumn + lRepeated - lColumnFirst
               lColumn = lColumnFirst
               cell.setAttribute("numbercolumnsrepeated", str(lRepeated))
-            if lColumn + lRepeated > lColumnFirst + lFields:
+            if lColumn + lRepeated - 1 > lColumnFirst + lFields - 1:
               lRepeated = lColumnFirst + lFields - lColumn
               cell.setAttribute("numbercolumnsrepeated", str(lRepeated))
             tr.addElement(cell)
