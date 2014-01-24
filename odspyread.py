@@ -59,8 +59,6 @@ def getTable(sheet, lRowStart, lColumnStart):
       if len(cells) == 1 and cell2text(cells[0]) == "":
         # empty row (cell repeated)
         lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
-        if bHeader:
-          lRowEmptyCount += lRepeated
         lRow += lRepeated
         continue
       tr = TableRow()
@@ -88,7 +86,7 @@ def getTable(sheet, lRowStart, lColumnStart):
           lColumn += lRepeated
         table.addElement(tr)
       else:
-        lRowEmptyCount = 0
+        bEmpty = True
         for cell in cells:
           lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
           if ((lColumn >= lColumnFirst or lColumn + lRepeated - 1 >= lColumnFirst) and
@@ -101,9 +99,17 @@ def getTable(sheet, lRowStart, lColumnStart):
             if lColumn + lRepeated - 1 > lColumnFirst + lFields - 1:
               lRepeated = lColumnFirst + lFields - lColumn
               cell.setAttribute("numbercolumnsrepeated", str(lRepeated))
+            if bEmpty:
+              if cell2text(cell) != "":
+                bEmpty = False
             tr.addElement(cell)
           lColumn += lRepeated
-        table.addElement(tr)
+        if bEmpty:
+          lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
+          lRowEmptyCount += lRepeated
+        else:
+          lRowEmptyCount = 0
+          table.addElement(tr)
 
     lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
     lRow += lRepeated
