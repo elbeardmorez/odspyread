@@ -20,11 +20,25 @@ def log(arg, file = 1):
 
 def cell2text(cell):
   text = ""
+
+  # node collection
+  # ( ELEMENT_NODE, PROCESSING_INSTRUCTION_NODE, COMMENT_NODE,
+  #   TEXT_NODE, CDATA_SECTION_NODE, ENTITY_REFERENCE_NODE )
   textNodes = cell.getElementsByType(P)
   for tn in textNodes:
     for tn2 in tn.childNodes:
-#      if (tn.nodeType == 3): # avoid non-textNode types
-      text = text + unicode(tn2.data)
+      if tn2.nodeType == tn2.TEXT_NODE:
+        text = text + unicode(tn2.data)
+      elif tn2.nodeType == tn2.ELEMENT_NODE:
+        # text nested again due to styles?!
+        (options.verbosity > 1 and
+          log("[warning] detail lost in cell: '" + unicode(cell) + "'" ,2))
+        text = text + unicode(tn2)
+      else:
+        # ignore comments etc.
+        (options.verbosity > 1 and
+          log("[warning] ignoring typeNode=" + tn2.nodeType + " data in cell: '" +
+               unicode(cell) + "'" ,2))
   return text
 
 def table2array(table):
