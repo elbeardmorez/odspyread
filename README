@@ -42,6 +42,7 @@ Options:
   -x SEPARATIONROWCOUNT, --separation-row-count=SEPARATIONROWCOUNT
                         [optional] set the minimum number of concurrent empty
                         rows for determining table extents [default: 1]
+  --header-to-stderr    [optional] output first row to stderr [default: false]
   -v VERBOSITY, --verbosity=VERBOSITY
                         log level [default: 1]
 

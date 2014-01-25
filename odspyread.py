@@ -12,8 +12,11 @@ from odf.text import P
 
 #globals
 
-def log(arg):
-  print arg
+def log(arg, file = 1):
+  if file == 1:
+    sys.stdout.write(arg + "\n")
+  elif file == 2:
+    sys.stderr.write(arg + "\n")
 
 def cell2text(cell):
   text = ""
@@ -161,6 +164,10 @@ optionParser.add_option("-l", "--delimiter", metavar = "DELIMITER",
 optionParser.add_option("-x", "--separation-row-count", metavar = "SEPARATIONROWCOUNT",
                         type = "int", dest = "lSeparationRowCount", default = 1,
                         help = "[optional] set the minimum number of concurrent empty rows for determining table extents [default: 1]")
+optionParser.add_option("--header-to-stderr", metavar = "HEADERTOSTDERR",
+                        dest = "bHeaderToStdErr", default = False,
+                        action = "store_true",
+                        help = "[optional] output first row to stderr [default: false]")
 optionParser.add_option("-v", "--verbosity", metavar = "VERBOSITY",
                         type = "int", dest = "verbosity", default = 1,
                         action = "store",
@@ -222,7 +229,6 @@ try:
     bReadRow = True
     while bReadRow:
       if lRow == 0 and not bHeader:
-
         if options.sKeyName != "":
           # find key, and setup dictionary for output fields
           for lCol in range(len(data[0])):
@@ -264,12 +270,20 @@ try:
 
   if len(results) > 1:
     # print results
+    bHeader = False
     for row in results:
       text = ""
       for col in row:
         text = text + col.decode('utf-8') + options.sDelimiter.decode('utf-8') 
       text = text[:len(text) - len(options.sDelimiter)]
-      options.verbosity and log(text)
+      if not bHeader:
+        bHeader = True
+        if options.bHeaderToStdErr:
+          options.verbosity and log(text, 2)
+        else:
+          options.verbosity and log(text)
+      else:
+        options.verbosity and log(text)
 
 #except Exception: pass
 except Exception as e:
