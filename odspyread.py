@@ -130,9 +130,10 @@ optionParser = OptionParser()
 def optionsListCallback(option, opt, value, parser):
   setattr(optionParser.values, option.dest, tuple(value.split(',')))
 def optionsPathExpansionCallback(option, opt, value, parser):
-  setattr(optionParser.values, option.dest, os.path.expandvars(os.path.expanduser(value)).split(','))
+  setattr(optionParser.values, option.dest, os.path.expandvars(os.path.expanduser(value)))
 optionParser.add_option("-d", "--document", metavar = "DOC", default = "",
                         type = "string", dest = "sDoc",
+                        action = "callback", callback = optionsPathExpansionCallback,
                         help = "the spreadsheet path")
 optionParser.add_option("-e", "--sheet", metavar = "SHEET", default = "", 
                         type = "string", dest = "sSheet",
