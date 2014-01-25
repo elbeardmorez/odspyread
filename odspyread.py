@@ -198,14 +198,14 @@ try:
     raise Exception("[error] no document specified")
 
   if options.verbosity > 1:
-    log("verbose mode: level " + str(options.verbosity))
-    log("parsed args:")
+    log("[info] verbose mode: level " + str(options.verbosity))
+    log("[info] parsed args:")
     l = 0
     for name, value in options.__dict__.items():
       log( "idx: " + str(l) + ": '" + name + ": '" + str(value) + "'")
       l += 1
 
-    log("unparsed args:")
+    log("[info] unparsed args:")
     l = 0
     for value in args:
       log("idx: " + str(l) + ": '" + str(value) + "'")
@@ -239,7 +239,7 @@ try:
   aFields = []
   bHeader = False
   for value in options.sKeyValues:
-    options.verbosity > 1 and log("searching for value: '" + value + "'")
+    options.verbosity > 1 and log("[info] searching for value: '" + value + "'")
     lRow = 0
     bReadRow = True
     while bReadRow:
