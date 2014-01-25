@@ -255,7 +255,7 @@ try:
         results.append(aFields)
       else:
         # test key against key value
-        if data[lRow][lKey] == value or value == "*":
+        if value == "*" or data[lRow][lKey] == value:
           # success
           cols = []
           for l in lFields:
