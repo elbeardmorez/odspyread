@@ -23,13 +23,13 @@ Options:
                         in
   -s SEARCH, --search=SEARCH
                         [optional] comma-delimited list of value(s) to search
-                        for in the index/key field [default: *]
+                        for in the index/key field [default: '*']
   -m, --allow-duplicates
                         [optional] continue searching for duplicates after
                         match [default: false]
   -f FIELDS, --fields=FIELDS
                         [optional] comma delimited list of field(s) to extract
-                        data from [default: *]
+                        data from [default: '*']
   -r HEADERROWSTART, --header-row=HEADERROWSTART
                         [optional] row number for specifying table location
                         where multiple tables exist in a sheet [default: 1]
@@ -43,6 +43,12 @@ Options:
                         [optional] set the minimum number of concurrent empty
                         rows for determining table extents [default: 1]
   --header-to-stderr    [optional] output first row to stderr [default: false]
+  --comment-filter=COMMENTFILTER
+                        [optional] comma delimited list of prefixes to ignore
+                        when determining table position [default: '#']
+  --row-filter=ROWFILTER
+                        [optional] comma delimited list of terms to be
+                        filtered out results
   -v VERBOSITY, --verbosity=VERBOSITY
                         log level [default: 1]
 
@@ -70,8 +76,38 @@ header 1 | header 2 idx | header 2 | header 4
 header 1 idx,header 3
 search 2,data2 2 3
 
+*without comment filters the table is identifies as a 4x1, the comment viewed a header
+>./odspyread.py -d test.ods -r 25  -x 2 --comment-filter=""
+# table 5
+header 1
+
+data5 2 1
+
+*filtering the '# table 5' comment we recover our intended 7x4 table. note here that the 2 rows below 'data 5 2 1' are now not seen as empty, there is data in columns 2 and 3 respectively, hence the table extends beyond that identified in the previous example 
+>./odspyread.py -d test.ods -r 25  -x 2 --comment-filter="#"
+header 1 | header 2 | header 3 | header 4
+ |  | data5 1 3 | data5 1 4
+data5 2 1 |  |  |
+ | data5 3 2 | data5 3 3 | data5 3 4
+ |  | data5 4 3 | data5 4 4
+ |  |  |
+data5 6 1 | data5 6 2 | data5 6 3 | data5 6 4
+
+*no row filter set (default)
+>./odspyread.py -d test.ods -r 25 -c 8 --row-filter=''
+header 1 | header 2 | header 3
+data5 2 1 |  | data5 1 3
+!! comment row |  |
+data5 2 2 | data5 3 2 | data5 3 3
+
+*rows are filtered if any entry in them are prefixed with a filter term
+>./odspyread.py -d test.ods -r 25 -c 8 --row-filter='!'
+header 1 | header 2 | header 3
+data5 2 1 |  | data5 1 3
+data5 2 2 | data5 3 2 | data5 3 3
+
 ## todo
 -regexp search switch
--ignore prefix/filter
--handle non-existent fields
-
+-handle non-existent tables and fields
+-create class
+-README markdown

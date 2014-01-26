@@ -67,7 +67,9 @@ def getTable(sheet, lRowStart, lColumnStart):
   rows = sheet.getElementsByType(TableRow)
   lRow = 1
   lRowEmptyCount = 0
+  table = None
   for row in rows:
+    tr = None
     lColumn = 1
     if lRowEmptyCount >= options.lSeparationRowCount:
       # end of table
@@ -81,32 +83,42 @@ def getTable(sheet, lRowStart, lColumnStart):
         if bHeader:
           lRowEmptyCount += lRepeated
         continue
-      tr = TableRow()
       if not bHeader:
-        bHeader = True
-        table = Table()
-        bData = False
         for cell in cells:
           lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
           if lColumn >= lColumnStart:
             text = cell2text(cell)
             if text != "":
-              if not bData:
-                bData = True
+              if not bHeader:
+                # check if comment row
+                if options.sCommentFilter:
+                  bMatch = False
+                  for filter in options.sCommentFilter:
+                    if len(filter) <= len(text) and text[0:len(filter)] == filter:
+                      bMatch = True
+                      break
+                  if bMatch:
+                    break
+                bHeader = True
+                table = Table()
+                tr = TableRow()
                 lColumnFirst = lColumn;
               table.addElement(TableColumn(numbercolumnsrepeated = lRepeated))
               tr.addElement(cell)
               lFields = lFields + lRepeated
             else:
-              if bData:
+              if bHeader:
                 # end of table header
                 break
 #              else:
 #                # skip
           lColumn += lRepeated
-        table.addElement(tr)
+        if tr:
+          table.addElement(tr)
       else:
         bEmpty = True
+        tr = TableRow()
+        textRow = []
         for cell in cells:
           lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
           if ((lColumn >= lColumnFirst or lColumn + lRepeated - 1 >= lColumnFirst) and
@@ -119,9 +131,11 @@ def getTable(sheet, lRowStart, lColumnStart):
             if lColumn + lRepeated - 1 > lColumnFirst + lFields - 1:
               lRepeated = lColumnFirst + lFields - lColumn
               cell.setAttribute("numbercolumnsrepeated", str(lRepeated))
-            if bEmpty:
-              if cell2text(cell) != "":
-                bEmpty = False
+            text = cell2text(cell)
+            if text != "":
+              bEmpty = False
+              if options.sRowFilter:
+                textRow.append(text)
             tr.addElement(cell)
           lColumn += lRepeated
         if bEmpty:
@@ -133,7 +147,17 @@ def getTable(sheet, lRowStart, lColumnStart):
             tr2.addElement(TableCell(numbercolumnsrepeated = lFields))
             table.addElement(tr2)
             lRowEmptyCount = 0
-          table.addElement(tr)
+          bFilter = False
+          if options.sRowFilter:
+            for text in textRow:
+              for filter in options.sRowFilter:
+                if len(filter) <= len(text) and text[0:len(filter)] == filter:
+                  bFilter = True
+                  break
+              if bFilter:
+                break
+          if not bFilter:
+            table.addElement(tr)
 
     lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
     lRow += lRepeated
@@ -142,7 +166,10 @@ def getTable(sheet, lRowStart, lColumnStart):
 #args
 optionParser = OptionParser()
 def optionsListCallback(option, opt, value, parser):
-  setattr(optionParser.values, option.dest, tuple(value.split(',')))
+  if value == "":
+    setattr(optionParser.values, option.dest, None)
+  else:
+    setattr(optionParser.values, option.dest, tuple(value.split(',')))
 def optionsPathExpansionCallback(option, opt, value, parser):
   setattr(optionParser.values, option.dest, os.path.expandvars(os.path.expanduser(value)))
 optionParser.add_option("-d", "--document", metavar = "DOC", default = "",
@@ -158,7 +185,7 @@ optionParser.add_option("-i", "--idx", metavar = "IDX", default = "",
 optionParser.add_option("-s", "--search", metavar = "SEARCH", default = ("*"),
                         type = "string", dest = "sKeyValues",
                         action = "callback", callback = optionsListCallback,
-                        help = "[optional] comma-delimited list of value(s) to search for in the index/key field [default: *]")
+                        help = "[optional] comma-delimited list of value(s) to search for in the index/key field [default: '*']")
 optionParser.add_option("-m", "--allow-duplicates", metavar = "DUPLICATES",
                         dest = "bDuplicates", default = False,
                         action = "store_true",
@@ -166,7 +193,7 @@ optionParser.add_option("-m", "--allow-duplicates", metavar = "DUPLICATES",
 optionParser.add_option('-f', '--fields', metavar = "FIELDS", default = ("*"),
                         type = "string", dest = "sFields",
                         action = "callback", callback = optionsListCallback,
-                        help = "[optional] comma delimited list of field(s) to extract data from [default: *]")
+                        help = "[optional] comma delimited list of field(s) to extract data from [default: '*']")
 optionParser.add_option("-r", "--header-row", metavar = "HEADERROWSTART",
                         type = "int", dest = "lRowStart", default = 1,
                         help = "[optional] row number for specifying table location where multiple tables exist in a sheet [default: 1]")
@@ -183,6 +210,14 @@ optionParser.add_option("--header-to-stderr", metavar = "HEADERTOSTDERR",
                         dest = "bHeaderToStdErr", default = False,
                         action = "store_true",
                         help = "[optional] output first row to stderr [default: false]")
+optionParser.add_option('--comment-filter', metavar = "COMMENTFILTER", default = ("#"),
+                        type = "string", dest = "sCommentFilter",
+                        action = "callback", callback = optionsListCallback,
+                        help = "[optional] comma delimited list of prefixes to ignore when determining table position [default: '#']")
+optionParser.add_option('--row-filter', metavar = "ROWFILTER", default = (""),
+                        type = "string", dest = "sRowFilter",
+                        action = "callback", callback = optionsListCallback,
+                        help = "[optional] comma delimited list of terms to be filtered out results")
 optionParser.add_option("-v", "--verbosity", metavar = "VERBOSITY",
                         type = "int", dest = "verbosity", default = 1,
                         action = "store",
