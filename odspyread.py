@@ -3,6 +3,8 @@
 #system
 import sys
 import os
+import string
+import re
 from optparse import OptionParser # deprecated
 
 #external
@@ -167,7 +169,8 @@ def optionsListCallback(option, opt, value, parser):
   if value == "":
     setattr(optionParser.values, option.dest, None)
   else:
-    setattr(optionParser.values, option.dest, tuple(value.split(',')))
+    setattr(optionParser.values, option.dest,
+            map(lambda s: string.replace(s, "\\,", ","), re.findall("(.*?[^\\\],|.+$)", value)))
 def optionsPathExpansionCallback(option, opt, value, parser):
   setattr(optionParser.values, option.dest, os.path.expandvars(os.path.expanduser(value)))
 optionParser.add_option("-d", "--document", metavar = "DOC", default = "",
@@ -319,11 +322,13 @@ try:
 
   if len(results) > 1:
     # print results
+    sDelimiterEscape = string.join(map(lambda x: "\\"+x, options.sDelimiter), "")
     bHeader = False
     for row in results:
       text = ""
       for col in row:
-        text = text + col.decode('utf-8') + options.sDelimiter.decode('utf-8')
+        text = (text + string.replace(col.decode('utf-8'), options.sDelimiter, sDelimiterEscape)
+                + options.sDelimiter.decode('utf-8'))
       text = text[:len(text) - len(options.sDelimiter)]
       if not bHeader:
         bHeader = True

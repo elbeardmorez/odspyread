@@ -106,6 +106,11 @@ header 1 | header 2 | header 3
 data5 2 1 |  | data5 1 3
 data5 2 2 | data5 3 2 | data5 3 3
 
+*protect search terms containing commas, and always escape output which contains the delimiter string. without the escape in the search term here, terms 'atom1' and 'atom2' would be searched for independently
+>./odspyread -d test.ods -r 36 -i groups -s "atom1\,atom2" -m --delimiter=","
+groups,times
+atom1\,atom2,3\,2\,3
+
 ## todo
 -regexp search switch
 -handle non-existent tables and fields
