@@ -5,12 +5,10 @@ import sys
 import os
 from optparse import OptionParser # deprecated
 
-#local
+#external
 import odf.opendocument
 from odf.table import *
 from odf.text import P
-
-#globals
 
 def log(arg, file = 1):
   if file == 1:
@@ -176,7 +174,7 @@ optionParser.add_option("-d", "--document", metavar = "DOC", default = "",
                         type = "string", dest = "sDoc",
                         action = "callback", callback = optionsPathExpansionCallback,
                         help = "the spreadsheet path")
-optionParser.add_option("-e", "--sheet", metavar = "SHEET", default = "", 
+optionParser.add_option("-e", "--sheet", metavar = "SHEET", default = "",
                         type = "string", dest = "sSheet",
                         help = "[optional] sheet name of interest [default: first sheet]")
 optionParser.add_option("-i", "--idx", metavar = "IDX", default = "",
@@ -325,7 +323,7 @@ try:
     for row in results:
       text = ""
       for col in row:
-        text = text + col.decode('utf-8') + options.sDelimiter.decode('utf-8') 
+        text = text + col.decode('utf-8') + options.sDelimiter.decode('utf-8')
       text = text[:len(text) - len(options.sDelimiter)]
       if not bHeader:
         bHeader = True
