@@ -19,6 +19,12 @@ Options:
   -e SHEET, --sheet=SHEET
                         [optional] sheet name of interest [default: first
                         sheet]
+  -r HEADERROWSTART, --header-row=HEADERROWSTART
+                        [optional] locate table position in sheet by row
+                        number [default: 1]
+  -c HEADERCOLUMNSTART, --header-column=HEADERCOLUMNSTART
+                        [optional] locate table position in sheet by column
+                        number [default: 1]
   -i IDX, --idx=IDX     [optional] name of the index/key field for searching
                         in
   -s SEARCH, --search=SEARCH
@@ -30,18 +36,12 @@ Options:
   -f FIELDS, --fields=FIELDS
                         [optional] comma delimited list of field(s) to extract
                         data from [default: '*']
-  -r HEADERROWSTART, --header-row=HEADERROWSTART
-                        [optional] row number for specifying table location
-                        where multiple tables exist in a sheet [default: 1]
-  -c HEADERCOLUMNSTART, --header-column=HEADERCOLUMNSTART
-                        [optional] column number for specifying table location
-                        where multiple tables exist in a sheet [default: 1]
-  -l DELIMITER, --delimiter=DELIMITER
-                        [optional] change the data output delimiter [default:
-                        ' | ']
   -x SEPARATIONROWCOUNT, --separation-row-count=SEPARATIONROWCOUNT
                         [optional] set the minimum number of concurrent empty
                         rows for determining table extents [default: 1]
+  --delimiter=DELIMITER
+                        [optional] change the data output delimiter [default:
+                        ' | ']
   --header-to-stderr    [optional] output first row to stderr [default: false]
   --comment-filter=COMMENTFILTER
                         [optional] comma delimited list of prefixes to ignore

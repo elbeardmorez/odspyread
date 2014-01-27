@@ -173,50 +173,50 @@ def optionsListCallback(option, opt, value, parser):
             map(lambda s: string.replace(s, "\\,", ","), re.findall("(.*?[^\\\],|.+$)", value)))
 def optionsPathExpansionCallback(option, opt, value, parser):
   setattr(optionParser.values, option.dest, os.path.expandvars(os.path.expanduser(value)))
-optionParser.add_option("-d", "--document", metavar = "DOC", default = "",
-                        type = "string", dest = "sDoc",
+optionParser.add_option("-d", "--document", metavar = "DOC",
+                        type = "string", dest = "sDoc", default = "",
                         action = "callback", callback = optionsPathExpansionCallback,
                         help = "the spreadsheet path")
-optionParser.add_option("-e", "--sheet", metavar = "SHEET", default = "",
-                        type = "string", dest = "sSheet",
+optionParser.add_option("-e", "--sheet", metavar = "SHEET",
+                        type = "string", dest = "sSheet", default = "",
                         help = "[optional] sheet name of interest [default: first sheet]")
-optionParser.add_option("-i", "--idx", metavar = "IDX", default = "",
-                        type = "string", dest = "sKeyName",
+optionParser.add_option("-r", "--header-row", metavar = "HEADERROWSTART",
+                        type = "int", dest = "lRowStart", default = 1,
+                        help = "[optional] locate table position in sheet by row number [default: 1]")
+optionParser.add_option("-c", "--header-column", metavar = "HEADERCOLUMNSTART",
+                        type = "int", dest = "lColumnStart", default = 1,
+                        help = "[optional] locate table position in sheet by column number [default: 1]")
+optionParser.add_option("-i", "--idx", metavar = "IDX",
+                        type = "string", dest = "sKeyName", default = "",
                         help = "[optional] name of the index/key field for searching in")
-optionParser.add_option("-s", "--search", metavar = "SEARCH", default = ("*"),
-                        type = "string", dest = "sKeyValues",
+optionParser.add_option("-s", "--search", metavar = "SEARCH",
+                        type = "string", dest = "sKeyValues", default = ("*"),
                         action = "callback", callback = optionsListCallback,
                         help = "[optional] comma-delimited list of value(s) to search for in the index/key field [default: '*']")
 optionParser.add_option("-m", "--allow-duplicates", metavar = "DUPLICATES",
                         dest = "bDuplicates", default = False,
                         action = "store_true",
                         help = "[optional] continue searching for duplicates after match [default: false]")
-optionParser.add_option('-f', '--fields', metavar = "FIELDS", default = ("*"),
-                        type = "string", dest = "sFields",
+optionParser.add_option('-f', '--fields', metavar = "FIELDS",
+                        type = "string", dest = "sFields", default = ("*"),
                         action = "callback", callback = optionsListCallback,
                         help = "[optional] comma delimited list of field(s) to extract data from [default: '*']")
-optionParser.add_option("-r", "--header-row", metavar = "HEADERROWSTART",
-                        type = "int", dest = "lRowStart", default = 1,
-                        help = "[optional] row number for specifying table location where multiple tables exist in a sheet [default: 1]")
-optionParser.add_option("-c", "--header-column", metavar = "HEADERCOLUMNSTART",
-                        type = "int", dest = "lColumnStart", default = 1,
-                        help = "[optional] column number for specifying table location where multiple tables exist in a sheet [default: 1]")
-optionParser.add_option("-l", "--delimiter", metavar = "DELIMITER",
-                        type = "string", dest = "sDelimiter", default = u' | ',
-                        help = "[optional] change the data output delimiter [default: ' | ']")
 optionParser.add_option("-x", "--separation-row-count", metavar = "SEPARATIONROWCOUNT",
                         type = "int", dest = "lSeparationRowCount", default = 1,
                         help = "[optional] set the minimum number of concurrent empty rows for determining table extents [default: 1]")
+optionParser.add_option("--delimiter", metavar = "DELIMITER",
+                        type = "string", dest = "sDelimiter", default = u' | ',
+                        help = "[optional] change the data output delimiter [default: ' | ']")
 optionParser.add_option("--header-to-stderr", metavar = "HEADERTOSTDERR",
                         dest = "bHeaderToStdErr", default = False,
                         action = "store_true",
                         help = "[optional] output first row to stderr [default: false]")
-optionParser.add_option('--comment-filter', metavar = "COMMENTFILTER", default = ("#"),
-                        type = "string", dest = "sCommentFilter",
+optionParser.add_option('--comment-filter', metavar = "COMMENTFILTER",
+                        type = "string", dest = "sCommentFilter", default = ("#"),
                         action = "callback", callback = optionsListCallback,
                         help = "[optional] comma delimited list of prefixes to ignore when determining table position [default: '#']")
-optionParser.add_option('--row-filter', metavar = "ROWFILTER", default = (""),
-                        type = "string", dest = "sRowFilter",
+optionParser.add_option('--row-filter', metavar = "ROWFILTER",
+                        type = "string", dest = "sRowFilter", default = (""),
                         action = "callback", callback = optionsListCallback,
                         help = "[optional] comma delimited list of terms to be filtered out results")
 optionParser.add_option("-v", "--verbosity", metavar = "VERBOSITY",
