@@ -302,6 +302,7 @@ try:
           if not bSet:
             lFields.append(-1)
         # add headers to results array
+        bHeader=True
         results.append(aFields)
       else:
         # test key against key value
