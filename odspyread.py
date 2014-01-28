@@ -116,84 +116,84 @@ def getTable(sheet, sName, lRowStart, lColumnStart):
               break
             lColumnTitle += lRepeated
       else:
-      if not bHeader:
-        for cell in cells:
-          lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
-          if lColumn >= lColumnStart:
-            text = cell2text(cell)
-            if text != "":
-              if not bHeader:
-                # check if comment row
-                if options.sCommentFilter:
-                  bMatch = False
-                  for filter in options.sCommentFilter:
-                    if len(filter) <= len(text) and text[0:len(filter)] == filter:
-                      bMatch = True
+        if not bHeader:
+          for cell in cells:
+            lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
+            if lColumn >= lColumnStart:
+              text = cell2text(cell)
+              if text != "":
+                if not bHeader:
+                  # check if comment row
+                  if options.sCommentFilter:
+                    bMatch = False
+                    for filter in options.sCommentFilter:
+                      if len(filter) <= len(text) and text[0:len(filter)] == filter:
+                        bMatch = True
+                        break
+                    if bMatch:
                       break
-                  if bMatch:
-                    break
-                bHeader = True
-                table = Table()
-                tr = TableRow()
-                lColumnFirst = lColumn;
-              table.addElement(TableColumn(numbercolumnsrepeated = lRepeated))
-              tr.addElement(cell)
-              lFields = lFields + lRepeated
-            else:
-              if bHeader:
+                  bHeader = True
+                  table = Table()
+                  tr = TableRow()
+                  lColumnFirst = lColumn;
+                table.addElement(TableColumn(numbercolumnsrepeated = lRepeated))
+                tr.addElement(cell)
+                lFields = lFields + lRepeated
+              else:
+                if bHeader:
                   # end of a table header
                   if (lcTitle and
                     not (lcTitle >= lColumnFirst and lcTitle <= lColumnFirst + lFields - 1)):
                       bHeader = False
                   else:
-                break
+                    break
 
-          lColumn += lRepeated
-        if tr:
-          table.addElement(tr)
-      else:
-        bEmpty = True
-        tr = TableRow()
-        textRow = []
-        for cell in cells:
-          lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
-          if ((lColumn >= lColumnFirst or lColumn + lRepeated - 1 >= lColumnFirst) and
-             lColumn <= lColumnFirst + lFields - 1):
-            # trim overlap
-            if lColumn < lColumnFirst and lColumn + lRepeated - 1 >= lColumnFirst:
-              lRepeated = lColumn + lRepeated - lColumnFirst
-              lColumn = lColumnFirst
-              cell.setAttribute("numbercolumnsrepeated", str(lRepeated))
-            if lColumn + lRepeated - 1 > lColumnFirst + lFields - 1:
-              lRepeated = lColumnFirst + lFields - lColumn
-              cell.setAttribute("numbercolumnsrepeated", str(lRepeated))
-            text = cell2text(cell)
-            if text != "":
-              bEmpty = False
-              if options.sRowFilter:
-                textRow.append(text)
-            tr.addElement(cell)
-          lColumn += lRepeated
-        if bEmpty:
-          lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
-          lRowEmptyCount += lRepeated
-        else:
-          if lRowEmptyCount > 0:
-            tr2 = TableRow(numberrowsrepeated = lRowEmptyCount)
-            tr2.addElement(TableCell(numbercolumnsrepeated = lFields))
-            table.addElement(tr2)
-            lRowEmptyCount = 0
-          bFilter = False
-          if options.sRowFilter:
-            for text in textRow:
-              for filter in options.sRowFilter:
-                if len(filter) <= len(text) and text[0:len(filter)] == filter:
-                  bFilter = True
-                  break
-              if bFilter:
-                break
-          if not bFilter:
+            lColumn += lRepeated
+          if tr:
             table.addElement(tr)
+        else:
+          bEmpty = True
+          tr = TableRow()
+          textRow = []
+          for cell in cells:
+            lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
+            if ((lColumn >= lColumnFirst or lColumn + lRepeated - 1 >= lColumnFirst) and
+               lColumn <= lColumnFirst + lFields - 1):
+              # trim overlap
+              if lColumn < lColumnFirst and lColumn + lRepeated - 1 >= lColumnFirst:
+                lRepeated = lColumn + lRepeated - lColumnFirst
+                lColumn = lColumnFirst
+                cell.setAttribute("numbercolumnsrepeated", str(lRepeated))
+              if lColumn + lRepeated - 1 > lColumnFirst + lFields - 1:
+                lRepeated = lColumnFirst + lFields - lColumn
+                cell.setAttribute("numbercolumnsrepeated", str(lRepeated))
+              text = cell2text(cell)
+              if text != "":
+                bEmpty = False
+                if options.sRowFilter:
+                  textRow.append(text)
+              tr.addElement(cell)
+            lColumn += lRepeated
+          if bEmpty:
+            lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
+            lRowEmptyCount += lRepeated
+          else:
+            if lRowEmptyCount > 0:
+              tr2 = TableRow(numberrowsrepeated = lRowEmptyCount)
+              tr2.addElement(TableCell(numbercolumnsrepeated = lFields))
+              table.addElement(tr2)
+              lRowEmptyCount = 0
+            bFilter = False
+            if options.sRowFilter:
+              for text in textRow:
+                for filter in options.sRowFilter:
+                  if len(filter) <= len(text) and text[0:len(filter)] == filter:
+                    bFilter = True
+                    break
+                if bFilter:
+                  break
+            if not bFilter:
+              table.addElement(tr)
 
     lRepeated = int(row.getAttribute("numberrowsrepeated") or 1)
     lRow += lRepeated
