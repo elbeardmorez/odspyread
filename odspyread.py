@@ -59,15 +59,20 @@ def table2array(table):
       data.append(values)
   return data
 
-def getTable(sheet, lRowStart, lColumnStart):
+def getTable(sheet, sName, lRowStart, lColumnStart):
   table = None
   # look for pivot
   lFields = 0
   bHeader = False
+  bSearch = True
+  if sName == "":
+    bSearch == False
   rows = sheet.getElementsByType(TableRow)
   lRow = 1
+  lcTitle = None
   lRowEmptyCount = 0
   table = None
+  rowLast = None
   for row in rows:
     tr = None
     lColumn = 1
@@ -83,6 +88,34 @@ def getTable(sheet, lRowStart, lColumnStart):
         if bHeader:
           lRowEmptyCount += lRepeated
         continue
+      if bSearch:
+        if lRow == lRowStart and rowLast:
+          # look in row above for title
+          cellsLast = rowLast.getElementsByType(TableCell)
+          lColumnTitle = 1
+          for cell in cellsLast:
+            lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
+            if cell2text(cell).find(sName) > -1 and lColumnTitle >= lColumnStart:
+              lcTitle = lColumnTitle
+              bSearch = False
+              options.verbosity > 1 and (log("[debug] found title: '" + sName
+                                             + "' at: 'r" + str(lRow)
+                                             + "c" + str(lcTitle) + "'"))
+              break
+            lColumnTitle += lRepeated
+        if bSearch:
+          lColumnTitle = 1
+          for cell in cells:
+            lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
+            if cell2text(cell).find(sName) > -1 and lColumnTitle >= lColumnStart:
+              lcTitle = lColumnTitle
+              bSearch = False
+              options.verbosity > 1 and (log("[debug] found title: '" + sName
+                                             + "' at: 'r" + str(lRow)
+                                             + "c" + str(lcTitle) + "'"))
+              break
+            lColumnTitle += lRepeated
+      else:
       if not bHeader:
         for cell in cells:
           lRepeated = int(cell.getAttribute("numbercolumnsrepeated") or 1)
@@ -108,10 +141,13 @@ def getTable(sheet, lRowStart, lColumnStart):
               lFields = lFields + lRepeated
             else:
               if bHeader:
-                # end of table header
+                  # end of a table header
+                  if (lcTitle and
+                    not (lcTitle >= lColumnFirst and lcTitle <= lColumnFirst + lFields - 1)):
+                      bHeader = False
+                  else:
                 break
-#              else:
-#                # skip
+
           lColumn += lRepeated
         if tr:
           table.addElement(tr)
@@ -180,6 +216,9 @@ optionParser.add_option("-d", "--document", metavar = "DOC",
 optionParser.add_option("-e", "--sheet", metavar = "SHEET",
                         type = "string", dest = "sSheet", default = "",
                         help = "[optional] sheet name of interest [default: first sheet]")
+optionParser.add_option('-n', '--name', metavar = "NAME",
+                        type = "string", dest = "sName", default = (""),
+                        help = "[optional] locate table position in sheet by name")
 optionParser.add_option("-r", "--header-row", metavar = "HEADERROWSTART",
                         type = "int", dest = "lRowStart", default = 1,
                         help = "[optional] locate table position in sheet by row number [default: 1]")
@@ -263,7 +302,7 @@ try:
     raise Exception("[error] cannot get sheet named: '" + sSheet + "'")
 
   # get table
-  table = getTable(sheet, options.lRowStart, options.lColumnStart)
+  table = getTable(sheet, options.sName, options.lRowStart, options.lColumnStart)
   # flatten table
   data = table2array(table)
 

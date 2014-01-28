@@ -19,6 +19,7 @@ Options:
   -e SHEET, --sheet=SHEET
                         [optional] sheet name of interest [default: first
                         sheet]
+  -n NAME, --name=NAME  [optional] locate table position in sheet by name
   -r HEADERROWSTART, --header-row=HEADERROWSTART
                         [optional] locate table position in sheet by row
                         number [default: 1]
@@ -56,24 +57,24 @@ Options:
 
 the following examples are based on the content of 'test.odf':
 
-*search for 'search 2' record under field 'header 3 idx'
-> ./odspyread.py -d test.ods -i "header 3 idx" -s "search 2"
+*search for 'search 2' record under field 'idx'
+> ./odspyread.py -d test.ods -i "idx" -s "search 2"
 
-header 1 | header 2 | header 3 idx | header 4 | header 5
+header 1 | header 2 | idx | header 4 | header 5
  | data1 2 2 | search 2 |  |
 
 *dump a table which exists at some offset in the sheet
 >./odspyread.py -d test.ods -r 10 -c 5
 
-header 1 | header 2 idx | header 2 | header 4
+header 1 | idx | header 2 | header 4
  | search 1 |  |
  | search 2 | data3 2 2 |
  | search 3 |  | data3 3 4
 
-*search for 'search2' in sheet 'test' in the first table found beyond row 9, returning data for fields 'header1 idx' and 'header 3' only, delimited by ','
->./odspyread.py -d test.ods -r 9 -i 'header 1 idx' -s 'search 2' -f 'header 1 idx,header 3' -l ','
+*search for 'search2' in sheet 'test' in the first table found beyond row 9, returning data for fields 'idx' and 'header 3' only, delimited by ','
+>./odspyread.py -d test.ods -r 9 -i 'idx' -s 'search 2' -f 'idx,header 3' --delimiter ','
 
-header 1 idx,header 3
+idx,header 3
 search 2,data2 2 3
 
 *without comment filters the table is identifies as a 4x1, the comment viewed a header
@@ -110,6 +111,16 @@ data5 2 2 | data5 3 2 | data5 3 3
 >./odspyread -d test.ods -r 36 -i groups -s "atom1\,atom2" -m --delimiter=","
 groups,times
 atom1\,atom2,3\,2\,3
+
+*search for table by a title which must lie in a cells directly above any part of the table header. the '-n | --name' option can be supplemented with '-r | --header-row' and '-c | --header-column' options
+>./_odspyread -d test.ods -n "table 4" -c 2 -i idx -s "search2" --verbosity 2
+[debug] found title: 'table 4' at: 'r19c3'
+idx | header 2
+search2 | data4b 2 2
+>./_odspyread -d test.ods -n "table 4c" -i idx -s "search2" --verbosity 2
+[debug] found title: 'table 4c' at: 'r19c7'
+idx | header 2 | header 3
+search2 | data4c 2 2 | data4c 2 3
 
 ## todo
 -regexp search switch
