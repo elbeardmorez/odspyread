@@ -229,9 +229,13 @@ optionParser.add_option("-i", "--idx", metavar = "IDX",
                         type = "string", dest = "sKeyName", default = "",
                         help = "[optional] name of the index/key field for searching in")
 optionParser.add_option("-s", "--search", metavar = "SEARCH",
-                        type = "string", dest = "sKeyValues", default = ("*"),
+                        type = "string", dest = "sKeyValues", default = (""),
                         action = "callback", callback = optionsListCallback,
                         help = "[optional] comma-delimited list of value(s) to search for under the index/key field [default: '*']")
+optionParser.add_option("-x", "--regexp-search", metavar = "REGEXPSEARCH",
+                        type = "string", dest = "sKeyRegexpValues", default = (""),
+                        action = "callback", callback = optionsListCallback,
+                        help = "[optional] comma-delimited list of regular expression(s) to search for under the index/key field [default: '.*']")
 optionParser.add_option("-m", "--allow-duplicates", metavar = "DUPLICATES",
                         dest = "bDuplicates", default = False,
                         action = "store_true",
@@ -269,9 +273,6 @@ optionParser.add_option("-v", "--verbosity", metavar = "VERBOSITY",
 #process
 try:
 
-  if options.sDoc == "":
-    raise Exception("[error] no document specified")
-
   if options.verbosity > 1:
     log("[info] verbose mode: level " + str(options.verbosity))
     log("[info] parsed args:")
@@ -285,6 +286,19 @@ try:
     for value in args:
       log("idx: " + str(l) + ": '" + str(value) + "'")
       l += 1
+
+  if options.sDoc == "":
+    raise Exception("[error] no document specified")
+
+  searches = []
+  bRegexp = False
+  if options.sKeyValues:
+    searches = options.sKeyValues
+  elif options.sKeyRegexpValues:
+    searches = options.sKeyRegexpValues
+    bRegexp = True
+  else:
+    search = ('*')
 
   # load doc
   doc = odf.opendocument.load(options.sDoc)
@@ -313,8 +327,9 @@ try:
   lFields = []
   aFields = []
   bHeader = False
-  for value in options.sKeyValues:
-    options.verbosity > 1 and log("[info] searching for value: '" + value + "'")
+  for search in searches:
+    if options.sKeyName:
+      options.verbosity > 1 and log("[info] searching under header: '" + options.sKeyName + "' for value: '" + search + "'")
     lRow = 0
     bReadRow = True
     while bReadRow:
@@ -345,14 +360,16 @@ try:
         bHeader=True
         results.append(aFields)
       else:
-        # test key against key value
-        if value == "*" or data[lRow][lKey] == value:
+        # test search against key value
+        if (search == "*" or
+           (not bRegexp and data[lRow][lKey] == search) or
+           (bRegexp and re.match(search, data[lRow][lKey]))):
           # success
           cols = []
           for l in lFields:
             cols.append(data[lRow][l])
           results.append(cols)
-          if not options.bDuplicates and value != "*":
+          if not options.bDuplicates and search != "*":
             bReadRow = False
 
       lRow += 1
