@@ -71,7 +71,7 @@ the following examples are based on the content of 'test.odf':
 |---|---|---|---|---|
 |  | data1 2 2 | search 2 |  |  |
 
----
+## <p></p>
 
 *dump a table which exists at some offset in the sheet*
 
@@ -83,7 +83,7 @@ the following examples are based on the content of 'test.odf':
 |  | search 2 | data3 2 3 |  |
 |  | search 3 |  | data3 3 4 |
 
----
+## <p></p>
 
 *search for 'search2' in sheet 'test' in the first table found beyond row 9, returning data for fields 'idx' and 'header 3' only, delimited by ','*
 
@@ -92,7 +92,7 @@ the following examples are based on the content of 'test.odf':
     idx,header 3
     search 2,data2 2 3
 
----
+## <p></p>
 
 *without comment filters '** #table 5 **' is identified as a 4x1, as the comment viewed as a header*
 
@@ -117,7 +117,7 @@ the following examples are based on the content of 'test.odf':
 | &nbsp; |  |  |  |
 | data5 6 1 | data5 6 2 | data5 6 3 | data5 6 4 |
 
----
+## <p></p>
 
 *with no row filter set here (default)*
 
@@ -138,7 +138,7 @@ the following examples are based on the content of 'test.odf':
 | data5 2 1 |  | data5 1 3 |
 | data5 2 2 | data5 3 2 | data5 3 3 |
 
----
+## <p></p>
 
 *protect search terms containing commas, and always escape output which contains the delimiter string. without the escape in the search term here, terms 'atom1' and 'atom2' would be searched for independently*
 
@@ -147,7 +147,7 @@ the following examples are based on the content of 'test.odf':
     groups,times
     atom1\,atom2,3\,2\,3
 
----
+## <p></p>
 
 *search for table by a title which must exist in a cell directly above any part of the table header. the '-n | --name' option can be supplemented with '-r | --header-row' and '-c | --header-column' options*
 
@@ -167,7 +167,7 @@ the following examples are based on the content of 'test.odf':
 |---|---|---|
 | search2 | data4c 2 2 | data4c 2 3 |
 
----
+## <p></p>
 
 *regexp search for all 'atom1' related results*
 
@@ -178,7 +178,7 @@ the following examples are based on the content of 'test.odf':
 | atom1,atom3 | 5,4,4 |
 | atom1,atom2,atom3 | 1,1,1 |
 
----
+## <p></p>
 
 ### todo
 - [fix] remove duplicate result rows when given multiple search values
