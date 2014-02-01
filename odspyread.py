@@ -321,6 +321,7 @@ try:
   data = table2array(table)
 
   results = []
+  dResults = {}
 
   # process table
   lKey = -1
@@ -368,7 +369,13 @@ try:
           cols = []
           for l in lFields:
             cols.append(data[lRow][l])
-          results.append(cols)
+          if len(searches) > 1:
+            sResult = string.join(cols, "|")
+            if not sResult in dResults:
+              dResults[sResult] = sResult
+              results.append(cols)
+          else:
+            results.append(cols)
           if not options.bDuplicates and search != "*":
             bReadRow = False
 

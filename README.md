@@ -151,7 +151,7 @@ the following examples are based on the content of 'test.odf':
 
 *search for table by a title which must exist in a cell directly above any part of the table header. the '-n | --name' option can be supplemented with '-r | --header-row' and '-c | --header-column' options*
 
-`./odspyread.py -d test.ods -n "table 4" -c 2 -i idx -s "search2" --verbosi y 2`
+`./odspyread.py -d test.ods -n "table 4" -c 2 -i idx -s "search2" --verbosity 2`
 
 `[debug] found title: 'table 4' at: 'r19c3'`
 
@@ -181,7 +181,6 @@ the following examples are based on the content of 'test.odf':
 ## <p></p>
 
 ### todo
-- [fix] remove duplicate result rows when given multiple search values
 - [fix] handle non-existent tables and fields
 - [add] create class interface
 - [imp] deprecate optparse
