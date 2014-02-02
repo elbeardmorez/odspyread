@@ -66,7 +66,7 @@ def getTable(sheet, sName, lRowStart, lColumnStart):
   bHeader = False
   bSearch = True
   if sName == "":
-    bSearch == False
+    bSearch = False
   rows = sheet.getElementsByType(TableRow)
   lRow = 1
   lcTitle = None
