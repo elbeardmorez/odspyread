@@ -298,7 +298,7 @@ try:
     searches = options.sKeyRegexpValues
     bRegexp = True
   else:
-    search = ('*')
+    searches = ('*')
 
   # load doc
   doc = odf.opendocument.load(options.sDoc)
