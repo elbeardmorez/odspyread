@@ -317,6 +317,13 @@ try:
 
   # get table
   table = getTable(sheet, options.sName, options.lRowStart, options.lColumnStart)
+  if not table:
+    if options.sName:
+      raise Exception("[user] no table named '" + options.sName + "'")
+    else:
+      raise Exception("[user] no table found at/past 'r" + str(options.lRowStart)
+                       + "c" + str(options.lColumnStart) + "'")
+
   # flatten table
   data = table2array(table)
 
@@ -349,16 +356,19 @@ try:
             aFields.append(data[lRow][lCol])
         else:
           aFields = options.sFields
-          bSet = False
+          aFields2 = []
           for sField in aFields:
+            bSet = False
             for lCol in range(len(data[0])):
               if data[lRow][lCol] == sField:
                 lFields.append(lCol)
+                aFields2.append(sField)
                 bSet = True
-          if not bSet:
-            lFields.append(-1)
+            if not bSet:
+              options.verbosity > 0 and log("[warning] skipping invalid field: '" + sField + "'")
+          aFields = aFields2
         # add headers to results array
-        bHeader=True
+        bHeader = True
         results.append(aFields)
       else:
         # test search against key value
@@ -383,7 +393,7 @@ try:
       if lRow > len(data) - 1:
         bReadRow = False
 
-  if len(results) > 1:
+  if len(results) > 1 and len(aFields) > 0:
     # print results
     sDelimiterEscape = string.join(map(lambda x: "\\"+x, options.sDelimiter), "")
     bHeader = False

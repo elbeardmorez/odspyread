@@ -125,9 +125,9 @@ the following examples are based on the content of 'test.odf':
 
 | header 1 | header 2 | header 3 |
 |---|---|---|
-| data5 2 1 |  | data5 1 3 |
+| data6 2 1 |  | data6 1 3 |
 | !! comment row |  |  |
-| data5 2 2 | data5 3 2 | data5 3 3 |
+| data6 2 2 | data6 3 2 | data6 3 3 |
 
 *now adding a row filter mean rows are filtered out if its cells contain data prefixed with the filter term(s)*
 
@@ -181,6 +181,5 @@ the following examples are based on the content of 'test.odf':
 ## <p></p>
 
 ### todo
-- [fix] handle non-existent tables and fields
 - [add] create class interface
 - [imp] deprecate optparse
