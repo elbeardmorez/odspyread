@@ -206,7 +206,7 @@ def optionsListCallback(option, opt, value, parser):
     setattr(optionParser.values, option.dest, None)
   else:
     setattr(optionParser.values, option.dest,
-            map(lambda s: string.replace(s, "\\,", ","), re.findall("(.*?[^\\\],|.+$)", value)))
+            map(lambda s: string.replace(s.rstrip(","), "\\,", ","), re.findall("(.*?[^\\\],|.+$)", value)))
 def optionsPathExpansionCallback(option, opt, value, parser):
   setattr(optionParser.values, option.dest, os.path.expandvars(os.path.expanduser(value)))
 optionParser.add_option("-d", "--document", metavar = "DOC",
