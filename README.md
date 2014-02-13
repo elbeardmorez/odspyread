@@ -2,7 +2,7 @@
 ## odspyread
 
 ### description
-python script to extract data from an ods format spreadsheet. handles multiple tables per sheet. optionally search for a value in a specified index/field and dump a selection/all fields' data for the records found
+python script for extracting data from an ods format spreadsheet. handles multiple tables per sheet. optionally search for a value in a specified index/field and dump a selection/all fields' data for the records found
 
 ### dependencies
 - odfpy
@@ -61,7 +61,7 @@ Options:
 ### examples
 
 
-the following examples are based on the content of 'test.odf':
+the following examples are based on the content of 'test.ods':
 
 *search for 'search 2' record under field 'idx'*
 
